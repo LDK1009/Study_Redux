@@ -1,7 +1,7 @@
 # 개념
 
 > 액션(Action)
-* 액션은 type, payload 필드를 가진 **JS 객체(Object)**입니다.
+* 액션은 type, payload 필드를 가진 **JS 객체(Object)** 입니다.
 * type 필드에는 애플리케이션에서 발생한 작업을 설명하는 문자열이 들어갑니다.<br/>
 ex) todos/todoAdded
 * payload 필드에는 작업에 대한 추가 정보가 들어갑니다.
@@ -13,8 +13,10 @@ const addTodoAction = {
 }
 ```
 
+<br/>
+
 > 액션 생성자(Action Creators)
-* 액션 생성자는 **액션 객체를 생성하고 반환하는 함수**입니다.
+* 액션 생성자는 **액션 객체를 생성하고 반환하는 함수** 입니다.
 * 액션 생성자를 통해 액션 객체를 생성할 수 있으므로 매번 액션 객체를 직접 작성할 필요가 없습니다.
 
 ```js
@@ -31,15 +33,65 @@ const addTodo = (text) => {
 }
 ```
 
+<br/>
+
 > 리듀서(Reducers)
 * 리듀서는 현재 상태(state)와 액션 객체(action)을 인수로 받아 새로운 상태를 반환하는 함수입니다. 
 * 리듀서는 수신된 액션(이벤트) 유형에 따라 이벤트를 처리하는 이벤트 리스너로 생각할 수 있습니다.
+
+```js
+// 초기 상태 정의
+const initialState = {
+  value: 0,
+};
+
+// 리듀서 함수 정의
+function counterReducer(state = initialState, action) {
+  // action.type에 따라 상태 변경 처리
+  switch (action.type) {
+    case 'INCREMENT':
+      return {
+        ...state,
+        value: state.value + 1,  // value 값을 1 증가
+      };
+    case 'INCREMENT_BY_AMOUNT':
+      return {
+        ...state,
+        value: state.value + action.payload,  // payload 만큼 증가
+      };
+    default:
+      return state;  // 아무런 액션 타입이 일치하지 않으면 현재 상태 반환
+  }
+}
+
+// 액션 생성자 함수들
+function increment() {
+  return { type: 'INCREMENT' };
+}
+
+function incrementByAmount(amount) {
+  return { type: 'INCREMENT_BY_AMOUNT', payload: amount };
+}
+
+// 리듀서 테스트
+state = counterReducer(state, increment());
+console.log(state);  // { value: 1 }
+
+state = counterReducer(state, incrementByAmount(5));
+console.log(state);  // { value: 6 }
+```
+
+<br/>
 
 > 리듀서 규칙(Reducers Rules)
 1. 상태(state)와 액션(action) 인수를 기반으로 새 상태 값만 계산해야 합니다. 
 2. 기존 상태를 수정할 수 없습니다.
 대신 기존 상태를 복사하고 복사된 값을 변경하는 방식으로 변경 불가능한 업데이트를 수행해야 합니다.
 3. 비동기 로직을 수행하거나 임의의 값을 계산하거나 기타 "부작용"을 일으키지 않아야 합니다.
+
+
+
+<br/>
 
 > 스토어(store)
 * Redux에서 상태는 스토어(store)에 저장됩니다.
@@ -73,6 +125,8 @@ store.dispatch({ type: 'counter/increment' })
 console.log(store.getState()) // {value: 1}
 ```
 
+<br/>
+
 > 액션 생성자
 윗 부분 코드에서 dispatch 인수를 전달할 때 액션 생성자를 이용할 수 있다.
 
@@ -88,6 +142,7 @@ store.dispatch(increment())
 console.log(store.getState()) // {value: 2}
 ```
 
+<br/>
 
 > 선택자
 윗 부분 코드에서 getState로 state값을 읽을 때 생성자를 통해 반복되는 코드 작성을 피할 수 있다.
@@ -99,11 +154,16 @@ const currentValue = selectCounterValue(store.getState())
 console.log(currentValue) // 2
 ```
 
+<br/>
+<br/>
+
 # 실습
 
 [실습 코드 링크](https://codesandbox.io/p/sandbox/github/reduxjs/redux-essentials-counter-example/tree/master/?from-embed)
 
 [실습 코드 해석](https://ko.redux.js.org/tutorials/essentials/part-2-app-structure)
+
+<br/>
 
 > 폴더 구조
 ```
@@ -120,7 +180,7 @@ project/
 └──
 ```
 
-
+<br/>
 
 > 1. store.js 생성
 * Redux 스토어를 중앙에서 관리하고, 애플리케이션의 모든 상태(state)를 한 곳에서 관리할 수 있도록 설정하기 위해서 store.js 파일을 생성합니다.
@@ -140,6 +200,8 @@ export default configureStore({
 });
 
 ```
+
+<br/>
 
 > 2. <App /> 컴포넌트를 <Provider /> 로 감싸기
 * Redux 스토어를 React 컴포넌트 트리 전체에 주입하여, 모든 하위 컴포넌트가 Redux 스토어에 접근할 수 있도록 하기 위해 <App /> 컴포넌트를 <Provider /> 로 감싸줍니다.
@@ -175,6 +237,8 @@ root.render(
 
 reportWebVitals();
 ```
+
+<br/>
 
 > 3. 리듀서(counterSlice) 작성
 * 위 1,2 과정이 세팅 과정이라면 리듀서를 작성하는 3번 과정부터는 counterSlice.js 파일을 생성하여 상태(state)를 관리하고, 액션(action)에 따라 상태를 변경하는 로직을 정의하는 코드를 작성합니다.
